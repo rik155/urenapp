@@ -56,20 +56,41 @@ def autosize(ws):
     for col, width in widths.items():
         ws.column_dimensions[get_column_letter(col)].width = min(max(width + 2, 10), 34)
 
+def ensure_summary_sheets(wb):
+    if "Overzicht" not in wb.sheetnames:
+        ws = wb.create_sheet("Overzicht", 0)
+        ws.append(["Ingediend op", "Naam", "Periode", "Week", "Werkuren", "Vrije uren", "Totaal uren", "0-urencontract"])
+        style_header(ws); ws.freeze_panes = "A2"
+    if "Week-overzicht" not in wb.sheetnames:
+        ws = wb.create_sheet("Week-overzicht", 1)
+        ws.append(["Week", "Periode", "Naam", "Werkuren", "Vrije uren", "Totaal uren", "Ingediend op"])
+        style_header(ws); ws.freeze_panes = "A2"
+    if "Periode-overzicht" not in wb.sheetnames:
+        ws = wb.create_sheet("Periode-overzicht", 2)
+        ws.append(["Periode", "Week", "Naam", "Werkuren", "Vrije uren", "Totaal uren"])
+        style_header(ws); ws.freeze_panes = "A2"
+
 def init_workbook():
-    if WORKBOOK.exists(): return
+    if WORKBOOK.exists():
+        wb = load_workbook(WORKBOOK)
+        ensure_summary_sheets(wb)
+        wb.save(WORKBOOK)
+        return
     wb = Workbook()
     ws = wb.active
     ws.title = "Overzicht"
     ws.append(["Ingediend op", "Naam", "Periode", "Week", "Werkuren", "Vrije uren", "Totaal uren", "0-urencontract"])
     style_header(ws); ws.freeze_panes = "A2"
+    wk = wb.create_sheet("Week-overzicht")
+    wk.append(["Week", "Periode", "Naam", "Werkuren", "Vrije uren", "Totaal uren", "Ingediend op"])
+    style_header(wk); wk.freeze_panes = "A2"
     ps = wb.create_sheet("Periode-overzicht")
     ps.append(["Periode", "Week", "Naam", "Werkuren", "Vrije uren", "Totaal uren"])
     style_header(ps); ps.freeze_panes = "A2"
     wb.save(WORKBOOK)
 
 def upsert_submission(sub: Submission):
-    init_workbook(); wb = load_workbook(WORKBOOK)
+    init_workbook(); wb = load_workbook(WORKBOOK); ensure_summary_sheets(wb)
     period = period_for_week(sub.week); name = sub.name.strip(); sheet_name = safe_sheet_name(name)
     if sheet_name not in wb.sheetnames:
         ws = wb.create_sheet(sheet_name)
@@ -86,14 +107,28 @@ def upsert_submission(sub: Submission):
     for r in range(2, ws.max_row + 1):
         ws.cell(r, 5).number_format = "0.00"; ws.cell(r, 6).number_format = "0.00"
     autosize(ws)
+
     ov = wb["Overzicht"]
     for r in range(ov.max_row, 1, -1):
         if str(ov.cell(r, 2).value).strip().lower() == name.lower() and ov.cell(r, 4).value == sub.week: ov.delete_rows(r)
-    ov.append([ts, name, period, sub.week, round(work_total, 2), round(free_total, 2), round(work_total + free_total, 2), "Ja" if sub.zero_hours_contract else "Nee"]); autosize(ov)
+    ov.append([ts, name, period, sub.week, round(work_total, 2), round(free_total, 2), round(work_total + free_total, 2), "Ja" if sub.zero_hours_contract else "Nee"])
+    autosize(ov)
+
+    wo = wb["Week-overzicht"]
+    for r in range(wo.max_row, 1, -1):
+        if str(wo.cell(r, 3).value).strip().lower() == name.lower() and wo.cell(r, 1).value == sub.week: wo.delete_rows(r)
+    wo.append([sub.week, period, name, round(work_total, 2), round(free_total, 2), round(work_total + free_total, 2), ts])
+    rows = list(wo.iter_rows(min_row=2, values_only=True))
+    if wo.max_row > 1: wo.delete_rows(2, wo.max_row - 1)
+    for row in sorted(rows, key=lambda x: (x[0] or 0, str(x[2] or ""))): wo.append(row)
+    autosize(wo)
+
     po = wb["Periode-overzicht"]
     for r in range(po.max_row, 1, -1):
         if str(po.cell(r, 3).value).strip().lower() == name.lower() and po.cell(r, 2).value == sub.week: po.delete_rows(r)
-    po.append([period, sub.week, name, round(work_total, 2), round(free_total, 2), round(work_total + free_total, 2)]); autosize(po)
+    po.append([period, sub.week, name, round(work_total, 2), round(free_total, 2), round(work_total + free_total, 2)])
+    autosize(po)
+
     wb.save(WORKBOOK)
     return {"period": period, "work_total": round(work_total, 2), "free_total": round(free_total, 2)}
 
