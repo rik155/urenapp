@@ -1,0 +1,2 @@
+.office-logo{display:block;width:220px;max-width:48vw;height:60px;object-fit:contain;object-position:left center}
+@media(max-width:520px){.topbar{height:72px}.office-logo{width:190px;max-width:65vw;height:54px}}
