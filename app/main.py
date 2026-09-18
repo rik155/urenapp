@@ -67,7 +67,7 @@ def autosize(ws):
             if x.value is not None:d[x.column]=max(d.get(x.column,0),len(str(x.value)))
     for col,w in d.items():ws.column_dimensions[get_column_letter(col)].width=min(max(w+2,10),36)
 def fetch_summary_rows():
-    c=db(); r=c.execute('''SELECT s.id,s.submitted_at,s.name,s.name_key,s.week,s.period,s.zero_hours_contract,COALESCE(SUM(w.work_hours),0) work_hours,COALESCE(SUM(w.free_hours),0) free_hours FROM submissions s LEFT JOIN work_lines w ON w.submission_id=s.id GROUP BY s.id ORDER BY s.week DESC,s.name COLLATE NOCASE''').fetchall();c.close();return r
+    c=db(); r=c.execute('''SELECT s.id,s.submitted_at,s.name,s.name_key,s.week,s.period,s.zero_hours_contract,COALESCE(SUM(w.work_hours),0) work_hours,COALESCE(SUM(w.free_hours),0) free_hours,COALESCE(GROUP_CONCAT(DISTINCT w.job),'') work_addresses FROM submissions s LEFT JOIN work_lines w ON w.submission_id=s.id GROUP BY s.id ORDER BY s.week DESC,s.name COLLATE NOCASE''').fetchall();c.close();return r
 def build_excel():
     wb=Workbook();ov=wb.active;ov.title='Overzicht';ov.append(['Ingediend op','Naam','Periode','Week','Werkuren','Vrije uren','Totaal uren','0-urencontract']);style_header(ov);ov.freeze_panes='A2'
     wo=wb.create_sheet('Week-overzicht');wo.append(['Week','Periode','Naam','Werkuren','Vrije uren','Totaal uren','Ingediend op']);style_header(wo);wo.freeze_panes='A2'
@@ -97,7 +97,7 @@ def submit_hours(s:Submission):
 def status():
     out=[]
     for r in fetch_summary_rows():
-        w=round(float(r['work_hours']),2);f=round(float(r['free_hours']),2);out.append({'id':r['id'],'submitted_at':r['submitted_at'],'name':r['name'],'name_key':r['name_key'],'period':r['period'],'week':r['week'],'work_hours':w,'free_hours':f,'total_hours':round(w+f,2),'zero_hours_contract':'Ja' if r['zero_hours_contract'] else 'Nee'})
+        w=round(float(r['work_hours']),2);f=round(float(r['free_hours']),2);out.append({'id':r['id'],'submitted_at':r['submitted_at'],'name':r['name'],'name_key':r['name_key'],'work_addresses':r['work_addresses'],'period':r['period'],'week':r['week'],'work_hours':w,'free_hours':f,'total_hours':round(w+f,2),'zero_hours_contract':'Ja' if r['zero_hours_contract'] else 'Nee'})
     return out
 @app.delete('/api/submission/{sid}')
 def delete_submission(sid:int):
