@@ -19,7 +19,7 @@ class WorkLine(BaseModel):
 class TemporaryWorkerLine(BaseModel):
     day:str; name:str=Field(min_length=2,max_length=60); hours:float=Field(gt=0,le=24); job:Optional[str]=Field(default='',max_length=120); note:Optional[str]=Field(default='',max_length=250)
 class Submission(BaseModel):
-    name:str=Field(min_length=2,max_length=60); week:int=Field(ge=1,le=53); zero_hours_contract:bool=False; lines:List[WorkLine]; temporary_workers:List[TemporaryWorkerLine]=[]
+    name:str=Field(min_length=2,max_length=60); week:int=Field(ge=1,le=53); zero_hours_contract:bool=False; lines:List[WorkLine]; temporary_workers:List[TemporaryWorkerLine]=Field(default_factory=list)
 def period_for_week(w): return ((w-1)//4)+1
 def safe_sheet_name(n): return (re.sub(r'[\\/*?:\[\]]','-',n).strip() or 'Medewerker')[:31]
 def db():
