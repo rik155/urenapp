@@ -1,1 +1,38 @@
-<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Jan Bos | Urenadministratie</title><link rel="icon" type="image/png" href="/static/icon-192.png?v=1"><link rel="stylesheet" href="/static/style.css?v=8"><link rel="stylesheet" href="/static/admin-brand.css?v=1"></head><body class="adminbody"><header class="topbar"><div class="topinner"><div class="brand"><img class="office-logo" src="/static/janbos-logo.jpg?v=1" alt="Jan Bos Glas- en Schilderwerken Totaalbouw"></div><div class="officebadge">Kantoor · Urenadministratie</div></div></header><main class="adminwrap"><section class="pagehead"><div><span class="eyebrow">KANTOOR</span><h1>Urenadministratie</h1><p>Controleer en beheer de ingediende uren voordat je Excel downloadt.</p></div><div class="actions"><button class="secondary" id="refreshBtn">Vernieuwen</button><button class="primary" id="excelBtn">Excel downloaden</button></div></section><section class="stats"><div class="stat"><span>Inzendingen</span><strong id="statSub">0</strong></div><div class="stat"><span>Medewerkers</span><strong id="statEmp">0</strong></div><div class="stat"><span>Werkuren</span><strong id="statWork">0</strong></div><div class="stat"><span>Vrije uren</span><strong id="statFree">0</strong></div></section><section class="admincard"><div class="toolbar"><div><h2>Ingediende weken</h2><p>Verwijder een foutieve week of alle gegevens van een medewerker vóór de Excel-export.</p></div><div class="filters"><input id="search" placeholder="Zoek werknemer of werkadres..."><select id="weekFilter"><option value="">Alle weken</option></select></div></div><div class="tablewrap"><table class="admintable"><thead><tr><th>Medewerker</th><th>Werkadres</th><th>Week</th><th>Periode</th><th>Werkuren</th><th>Vrije uren</th><th>Totaal</th><th>Ingediend</th><th>Beheer</th></tr></thead><tbody id="rows"></tbody></table></div></section></main><div id="toast" class="toast"></div><div id="modal" class="modal" hidden><div class="modalbox"><h3 id="modalTitle"></h3><p id="modalText"></p><div class="modalactions"><button class="secondary" id="cancelDelete">Annuleren</button><button class="danger" id="confirmDelete">Definitief verwijderen</button></div></div></div><script src="/static/admin.js?v=4"></script></body></html>
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Jan Bos | Urenadministratie</title>
+  <link rel="icon" type="image/png" href="/static/icon-192.png?v=1">
+  <link rel="stylesheet" href="/static/style.css?v=9">
+  <link rel="stylesheet" href="/static/admin-brand.css?v=1">
+</head>
+<body class="adminbody">
+  <header class="topbar"><div class="topinner"><div class="brand"><img class="office-logo" src="/static/janbos-logo.jpg?v=1" alt="Jan Bos Glas- en Schilderwerken Totaalbouw"></div><div class="officebadge">Kantoor · Urenadministratie</div></div></header>
+  <main class="adminwrap">
+    <section class="pagehead">
+      <div><span class="eyebrow">KANTOOR</span><h1>Urenadministratie</h1><p>Beheer projecten en controleer de ingediende uren.</p></div>
+      <div class="actions"><button class="secondary" id="refreshBtn">Vernieuwen</button><button class="primary" id="excelBtn">Excel downloaden</button></div>
+    </section>
+    <section class="project-card">
+      <div><span class="eyebrow">Projectbeheer</span><h2>Projecten voor medewerkers</h2><p>Toegevoegde projecten verschijnen direct in de keuzelijst van de medewerkers.</p></div>
+      <form id="projectForm" class="project-form"><input id="projectName" maxlength="120" placeholder="Projectnaam of werkadres" required><button class="primary" type="submit">Project toevoegen</button></form>
+      <div id="projectList" class="project-list"></div>
+    </section>
+    <section class="stats">
+      <div class="stat"><span>Inzendingen</span><strong id="statSub">0</strong></div>
+      <div class="stat"><span>Medewerkers</span><strong id="statEmp">0</strong></div>
+      <div class="stat"><span>Projecturen</span><strong id="statWork">0</strong></div>
+      <div class="stat"><span>Afwezigheidsuren</span><strong id="statAbsence">0</strong></div>
+    </section>
+    <section class="admincard">
+      <div class="toolbar"><div><h2>Ingediende weken</h2><p>Bekijk projecten, uitzendkrachten, verlof en afspraken per medewerker.</p></div><div class="filters"><input id="search" placeholder="Zoek medewerker of project..."><select id="weekFilter"><option value="">Alle weken</option></select></div></div>
+      <div class="tablewrap"><table class="admintable"><thead><tr><th>Medewerker</th><th>Projecten</th><th>Week</th><th>Periode</th><th>Projecturen</th><th>Afwezig</th><th>Totaal</th><th>Ingediend</th><th>Beheer</th></tr></thead><tbody id="rows"></tbody></table></div>
+    </section>
+  </main>
+  <div id="toast" class="toast"></div>
+  <div id="modal" class="modal" hidden><div class="modalbox"><h3 id="modalTitle"></h3><p id="modalText"></p><div class="modalactions"><button class="secondary" id="cancelDelete">Annuleren</button><button class="danger" id="confirmDelete">Definitief verwijderen</button></div></div></div>
+  <script src="/static/admin.js?v=5"></script>
+</body>
+</html>
